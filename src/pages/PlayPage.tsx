@@ -16,6 +16,7 @@ export default function PlayPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [turnFinished, setTurnFinished] = useState(false);
+  const [cardsGenerated, setCardsGenerated] = useState(0);
   
   const timerRef = useRef<number | null>(null);
 
@@ -40,7 +41,12 @@ export default function PlayPage() {
     setSpadeCategory(randomCat);
 
     if (mode === 'play') {
-      startTurn();
+      if (!isPlaying || turnFinished) {
+        startTurn();
+        setCardsGenerated(1);
+      } else {
+        setCardsGenerated(prev => prev + 1);
+      }
     }
   };
 
@@ -72,6 +78,7 @@ export default function PlayPage() {
     setIsPlaying(false);
     setTurnFinished(false);
     setTimeLeft(30);
+    setCardsGenerated(0);
     if (timerRef.current) clearInterval(timerRef.current);
   };
 
@@ -115,46 +122,45 @@ export default function PlayPage() {
             </button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center relative mt-12 sm:mt-0">
+          {mode === 'play' && (isPlaying || turnFinished) && (
+            <div className="w-full max-w-sm mx-auto mt-12 sm:mt-0 bg-gray-50 border border-gray-100 rounded-2xl p-4 flex items-center justify-between mb-4 z-10 relative">
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Time Left</span>
+                <span className={`text-3xl font-black tabular-nums transition-colors duration-300 ${
+                  timeLeft <= 5 && !turnFinished ? 'text-red-500 animate-pulse' : 'text-gray-900'
+                }`}>
+                  {timeLeft}s
+                </span>
+              </div>
+              <div className="h-10 w-[2px] bg-gray-200 rounded-full"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Cards</span>
+                <span className="text-3xl font-black tabular-nums text-[#E11D48]">
+                  {cardsGenerated}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className={`flex-1 flex flex-col items-center justify-center relative ${mode !== 'play' || (!isPlaying && !turnFinished) ? 'mt-12 sm:mt-0' : ''}`}>
             <ArticulateCard data={currentCard} spadeCategory={spadeCategory} />
           </div>
 
           <div className="flex justify-center gap-4 mt-6 sm:mt-4 h-16 relative z-20 shrink-0">
-            {(!isPlaying || turnFinished) && (
+            {mode === 'play' && turnFinished ? (
+              <button
+                onClick={handleStopTurn}
+                className="bg-[#E11D48] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm flex items-center gap-2 active:scale-95 transition-transform shadow-lg shadow-rose-200"
+              >
+                STOP TURN
+              </button>
+            ) : (
               <button
                 onClick={handleGenerate}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black uppercase tracking-widest text-xs sm:text-sm flex items-center gap-2 active:scale-95 transition-transform"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-4 h-4"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                {mode === 'play' ? 'START TURN' : 'GENERATE'}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {mode === 'play' && isPlaying && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] sm:w-[400px] rounded-[40px] p-8 sm:p-10 flex flex-col items-center text-center shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className={`w-24 h-24 rounded-full border-8 flex items-center justify-center mb-6 transition-colors duration-300 ${timeLeft <= 5 && !turnFinished ? 'border-red-500 animate-pulse' : 'border-[#E11D48]'}`}>
-              <span className={`text-4xl font-black tabular-nums ${timeLeft <= 5 && !turnFinished ? 'text-red-500' : 'text-gray-900'}`}>
-                {timeLeft}
-              </span>
-            </div>
-            
-            <h3 className="text-2xl font-black uppercase mb-2">
-              {turnFinished ? "Time's Up!" : "Turn in Progress"}
-            </h3>
-            <p className="text-gray-500 mb-8 font-medium">
-              {turnFinished ? "End of turn. Hand over the device!" : "Don't stop until the buzzer!"}
-            </p>
-            
-            {turnFinished && (
-              <button
-                onClick={handleStopTurn}
-                className="w-full bg-[#E11D48] py-4 rounded-2xl text-white font-bold text-lg active:scale-95 transition-transform shadow-lg shadow-rose-200"
-              >
-                STOP TURN
+                {mode === 'play' && !isPlaying ? 'START TURN' : (mode === 'play' ? 'NEXT CARD' : 'GENERATE')}
               </button>
             )}
           </div>
