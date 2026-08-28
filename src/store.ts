@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { CardData, CATEGORIES, Category } from './types';
 
-const STORAGE_KEY = 'articulate-data';
-
 const initialData: CardData = {
   Person: [],
   World: [],
@@ -13,23 +11,28 @@ const initialData: CardData = {
 };
 
 export function useStore() {
-  const [data, setData] = useState<CardData>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved) as CardData;
-      } catch (e) {
-        console.error('Failed to parse saved data', e);
+  const [data, setData] = useState<CardData>(initialData);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCards = async () => {
+    try {
+      const response = await fetch('/api/cards');
+      if (response.ok) {
+        const fetchedData = await response.json();
+        setData({ ...initialData, ...fetchedData });
       }
+    } catch (e) {
+      console.error('Failed to fetch cards', e);
+    } finally {
+      setLoading(false);
     }
-    return initialData;
-  });
+  };
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }, [data]);
+    fetchCards();
+  }, []);
 
-  const addEntries = (entries: Partial<Record<Category, string>>) => {
+  const addEntries = async (entries: Partial<Record<Category, string>>) => {
     setData((prev) => {
       const newData = { ...prev };
       CATEGORIES.forEach((cat) => {
@@ -39,6 +42,17 @@ export function useStore() {
       });
       return newData;
     });
+
+    try {
+      await fetch('/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entries),
+      });
+    } catch (error) {
+      console.error('Failed to save cards', error);
+      fetchCards();
+    }
   };
 
   const getStats = (): Record<Category, number> => {
@@ -49,5 +63,5 @@ export function useStore() {
     return stats;
   };
 
-  return { data, addEntries, getStats };
+  return { data, addEntries, getStats, loading };
 }
