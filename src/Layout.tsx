@@ -39,8 +39,6 @@ export default function Layout() {
             <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Card Bank</p>
             <p className="text-lg font-mono font-bold leading-none">Custom</p>
           </div>
-          <div className="h-10 w-[1px] bg-gray-200 hidden md:block"></div>
-          <button className="bg-gray-900 text-white px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold">Settings</button>
         </div>
       </header>
 

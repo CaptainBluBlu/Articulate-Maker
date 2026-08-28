@@ -11,9 +11,7 @@ export default function CreatePage() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (cat: Category, value: string) => {
-    if (value.length <= 100) {
-      setFormData(prev => ({ ...prev, [cat]: value }));
-    }
+    setFormData(prev => ({ ...prev, [cat]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,55 +29,75 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="flex-1 flex gap-6 p-6 overflow-hidden max-w-[1024px] mx-auto w-full animate-in fade-in duration-500 flex-col md:flex-row">
-      <section className="md:w-[420px] w-full shrink-0 bg-white rounded-3xl border border-gray-200 flex flex-col shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h2 className="text-xl font-bold">Card Creator</h2>
-          <span className="text-xs font-mono bg-gray-200 px-2 py-1 rounded">ID: #ART-882</span>
+    <div className="flex-1 flex flex-col gap-6 p-4 sm:p-6 overflow-y-auto max-w-3xl mx-auto w-full animate-in fade-in duration-500">
+      {/* Category Trackers Grid - Hidden on mobile, visible on sm and up */}
+      <div className="hidden sm:grid sm:grid-cols-6 gap-2.5 md:gap-3 shrink-0">
+        {CATEGORIES.map(cat => (
+          <div 
+            key={cat} 
+            className="bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center shadow-sm p-3 md:p-4 h-20 md:h-24 min-w-0"
+          >
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider truncate w-full text-center leading-tight">
+              {cat}
+            </p>
+            <p className={`text-lg md:text-xl font-bold leading-tight mt-0.5 ${CATEGORY_TEXT_COLORS[cat]}`}>
+              {stats[cat]}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Card Creator Form */}
+      <section className="w-full bg-white rounded-3xl border border-gray-200 flex flex-col shadow-xl overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <h2 className="text-lg sm:text-xl font-bold">Card Creator</h2>
         </div>
         
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="p-4 sm:p-6 space-y-2.5 sm:space-y-4">
             {CATEGORIES.map(cat => {
-              const length = formData[cat]?.length || 0;
               const textClass = CATEGORY_TEXT_COLORS[cat];
               // Extract hex color from class to use for focus ring (e.g. text-[#E11D48] -> #E11D48)
               const hexMatch = textClass.match(/text-\[(.*?)\]/);
               const hexColor = hexMatch ? hexMatch[1] : '';
               
               return (
-                <div key={cat} className="space-y-1">
-                  <label className={`text-[10px] font-black uppercase ${textClass} flex justify-between`}>
-                    <span>{cat}</span>
-                    <span className={length >= 100 ? 'text-red-500 font-bold' : 'text-gray-400'}>
-                      {length}/100
+                <div key={cat} className="space-y-0.5 sm:space-y-1">
+                  <label className={`text-[9px] sm:text-[10px] font-black uppercase ${textClass} flex justify-between items-center`}>
+                    <span className="flex items-center gap-1.5">
+                      <span>{cat}</span>
+                      <span className="sm:hidden font-mono font-semibold text-[8.5px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md lowercase tracking-normal">
+                        ({stats[cat]} added)
+                      </span>
                     </span>
                   </label>
                   <input
                     type="text"
                     value={formData[cat] || ''}
                     onChange={(e) => handleChange(cat, e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 outline-none transition-colors"
+                    className="w-full border-2 border-gray-100 rounded-lg sm:rounded-xl px-3 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-base outline-none transition-colors"
                     style={{ borderColor: formData[cat] ? hexColor : undefined }}
                     onFocus={(e) => e.target.style.borderColor = hexColor}
                     onBlur={(e) => { if (!formData[cat]) e.target.style.borderColor = ''; }}
                     placeholder={`e.g. new ${cat.toLowerCase()} word...`}
-                    maxLength={100}
                   />
                 </div>
               );
             })}
           </div>
 
-          <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between shrink-0">
+          <div className="p-5 sm:p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between shrink-0">
             <div className="flex gap-2">
-              <div className="h-2 w-2 rounded-full bg-[#E11D48]"></div>
-              <div className="h-2 w-2 rounded-full bg-[#2563EB]"></div>
-              <div className="h-2 w-2 rounded-full bg-[#0D9488]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#EAB308]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#1E3A8A]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#38BDF8]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#F97316]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#14532D]"></div>
+              <div className="h-2 w-2 rounded-full bg-[#7F1D1D]"></div>
             </div>
             <button
               type="submit"
-              className="bg-[#E11D48] text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-rose-200 active:scale-95 transition-all flex items-center gap-2"
+              className="bg-[#E11D48] text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-rose-200 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
             >
               {showSuccess ? (
                 <>
@@ -92,24 +110,6 @@ export default function CreatePage() {
             </button>
           </div>
         </form>
-      </section>
-
-      <section className="flex-1 flex flex-col gap-6 overflow-hidden">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 shrink-0">
-          {CATEGORIES.map(cat => (
-            <div key={cat} className="bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center shadow-sm p-4 sm:h-24">
-              <p className="text-[9px] font-bold text-gray-400 uppercase">{cat}</p>
-              <p className={`text-xl font-bold ${CATEGORY_TEXT_COLORS[cat]}`}>
-                {stats[cat]}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-8 flex flex-col items-center justify-center shadow-2xl relative">
-          <div className="text-center text-gray-400 font-bold uppercase tracking-widest opacity-50">
-            Switch to Playroom to view and play your cards
-          </div>
-        </div>
       </section>
     </div>
   );
