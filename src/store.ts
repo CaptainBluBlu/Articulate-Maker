@@ -40,6 +40,10 @@ function apiHeaders(): HeadersInit {
   return {
     'Content-Type': 'application/json',
     'x-visitor-id': visitorId,
+    'x-timezone': Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+    'x-language': typeof navigator !== 'undefined' ? navigator.language : '',
+    'x-screen-resolution': typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : '',
+    'x-referrer': typeof document !== 'undefined' ? document.referrer : '',
   };
 }
 

@@ -56,6 +56,10 @@ async function initDB() {
       device_type TEXT,
       device_vendor TEXT,
       device_model TEXT,
+      timezone TEXT,
+      language TEXT,
+      screen_resolution TEXT,
+      referrer TEXT,
       first_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -83,6 +87,14 @@ async function initDB() {
     )
   `);
 
+  // Create settings table
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
   // Migration: Add deck_id column to cards if it doesn't have one
   const tableInfo = await db.all("PRAGMA table_info(cards)");
   const hasDeckId = tableInfo.some((col: { name: string }) => col.name === 'deck_id');
@@ -96,6 +108,19 @@ async function initDB() {
   if (!defaultDeck) {
     await db.run('INSERT INTO decks (id, name) VALUES (?, ?)', DEFAULT_DECK_ID, 'Default Deck');
     console.log('[Migration] Created Default Deck.');
+  }
+
+  // Migration: Add extended tracking columns to visitors
+  const visitorCols = await db.all("PRAGMA table_info(visitors)");
+  const hasTimezone = visitorCols.some((col: { name: string }) => col.name === 'timezone');
+  if (!hasTimezone) {
+    await db.exec(`
+      ALTER TABLE visitors ADD COLUMN timezone TEXT;
+      ALTER TABLE visitors ADD COLUMN language TEXT;
+      ALTER TABLE visitors ADD COLUMN screen_resolution TEXT;
+      ALTER TABLE visitors ADD COLUMN referrer TEXT;
+    `);
+    console.log('[Migration] Added extended tracking columns to visitors table.');
   }
 }
 
@@ -112,15 +137,20 @@ async function trackVisitor(req: Request, res: Response, next: NextFunction) {
     const result = parser.getResult();
 
     const existing = await db.get('SELECT visitor_id FROM visitors WHERE visitor_id = ?', visitorId);
+    const timezone = (req.headers['x-timezone'] as string) || null;
+    const language = (req.headers['x-language'] as string) || null;
+    const screenRes = (req.headers['x-screen-resolution'] as string) || null;
+    const referrer = (req.headers['x-referrer'] as string) || null;
+
     if (existing) {
       await db.run(
-        'UPDATE visitors SET last_seen_at = CURRENT_TIMESTAMP, ip_address = ?, user_agent = ? WHERE visitor_id = ?',
-        ip, ua, visitorId
+        'UPDATE visitors SET last_seen_at = CURRENT_TIMESTAMP, ip_address = ?, user_agent = ?, timezone = ?, language = ?, screen_resolution = ?, referrer = ? WHERE visitor_id = ?',
+        ip, ua, timezone, language, screenRes, referrer, visitorId
       );
     } else {
       await db.run(
-        `INSERT INTO visitors (visitor_id, ip_address, user_agent, browser_name, browser_version, os_name, os_version, device_type, device_vendor, device_model)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO visitors (visitor_id, ip_address, user_agent, browser_name, browser_version, os_name, os_version, device_type, device_vendor, device_model, timezone, language, screen_resolution, referrer)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         visitorId,
         ip,
         ua,
@@ -130,7 +160,11 @@ async function trackVisitor(req: Request, res: Response, next: NextFunction) {
         result.os.version || null,
         result.device.type || 'desktop',
         result.device.vendor || null,
-        result.device.model || null
+        result.device.model || null,
+        timezone,
+        language,
+        screenRes,
+        referrer
       );
     }
   } catch (e) {
@@ -213,6 +247,47 @@ app.get('/api/decks/:deckId/logs', async (req: Request, res: Response) => {
 });
 
 // ─── Analytics Endpoints ─────────────────────────────────────────────────────
+
+app.get('/api/analytics/has-password', async (_req: Request, res: Response) => {
+  try {
+    const setting = await db.get('SELECT value FROM settings WHERE key = ?', 'analytics_password');
+    res.json({ hasPassword: !!setting && setting.value.trim().length > 0 });
+  } catch (error) {
+    console.error('Error checking analytics password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/analytics/verify', async (req: Request, res: Response) => {
+  try {
+    const { password } = req.body;
+    const setting = await db.get('SELECT value FROM settings WHERE key = ?', 'analytics_password');
+    if (!setting || setting.value.trim().length === 0) {
+      return res.json({ success: true, verified: true });
+    }
+    if (setting.value === password) {
+      return res.json({ success: true, verified: true });
+    }
+    return res.status(401).json({ success: false, verified: false, error: 'Invalid password' });
+  } catch (error) {
+    console.error('Error verifying analytics password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/analytics/password', async (req: Request, res: Response) => {
+  try {
+    const { password } = req.body;
+    await db.run(
+      'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+      'analytics_password', password || ''
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error setting analytics password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.get('/api/analytics/visitors', async (_req: Request, res: Response) => {
   try {

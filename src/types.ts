@@ -42,6 +42,10 @@ export interface Visitor {
   device_type: string;
   device_vendor: string;
   device_model: string;
+  timezone: string | null;
+  language: string | null;
+  screen_resolution: string | null;
+  referrer: string | null;
   first_seen_at: string;
   last_seen_at: string;
 }

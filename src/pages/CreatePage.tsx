@@ -39,10 +39,10 @@ export default function CreatePage() {
             key={cat} 
             className="bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center shadow-sm p-3 md:p-4 h-20 md:h-24 min-w-0"
           >
-            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider truncate w-full text-center leading-tight">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider truncate w-full text-center leading-tight">
               {cat}
             </p>
-            <p className={`text-lg md:text-xl font-bold leading-tight mt-0.5 ${CATEGORY_TEXT_COLORS[cat]}`}>
+            <p className={`text-xl md:text-2xl font-bold leading-tight mt-0.5 ${CATEGORY_TEXT_COLORS[cat]}`}>
               {stats[cat]}
             </p>
           </div>
@@ -52,7 +52,7 @@ export default function CreatePage() {
       {/* Card Creator Form */}
       <section className="w-full bg-white rounded-3xl border border-gray-200 flex flex-col shadow-xl overflow-hidden">
         <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h2 className="text-lg sm:text-xl font-bold">Card Creator</h2>
+          <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Card Creator</h1>
         </div>
         
         <form onSubmit={handleSubmit} className="flex flex-col">
@@ -64,11 +64,11 @@ export default function CreatePage() {
               const hexColor = hexMatch ? hexMatch[1] : '';
               
               return (
-                <div key={cat} className="space-y-0.5 sm:space-y-1">
-                  <label className={`text-[9px] sm:text-[10px] font-black uppercase ${textClass} flex justify-between items-center`}>
+                <div key={cat} className="space-y-1 sm:space-y-2">
+                  <label className={`text-xs sm:text-sm font-black uppercase ${textClass} flex justify-between items-center`}>
                     <span className="flex items-center gap-1.5">
                       <span>{cat}</span>
-                      <span className="sm:hidden font-mono font-semibold text-[8.5px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md lowercase tracking-normal">
+                      <span className="sm:hidden font-mono font-semibold text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md lowercase tracking-normal">
                         ({stats[cat]} added)
                       </span>
                     </span>
@@ -77,7 +77,7 @@ export default function CreatePage() {
                     type="text"
                     value={formData[cat] || ''}
                     onChange={(e) => handleChange(cat, e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-lg sm:rounded-xl px-3 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-base outline-none transition-colors"
+                    className="w-full border-2 border-gray-100 rounded-lg sm:rounded-xl px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-lg outline-none transition-colors"
                     style={{ borderColor: formData[cat] ? hexColor : undefined }}
                     onFocus={(e) => e.target.style.borderColor = hexColor}
                     onBlur={(e) => { if (!formData[cat]) e.target.style.borderColor = ''; }}

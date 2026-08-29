@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStore } from '../store';
 import { CATEGORIES, Category, CATEGORY_COLORS } from '../types';
-import { 
-  Upload, 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  Check, 
-  X, 
-  Search, 
-  FileText, 
-  Download, 
+import {
+  Upload,
+  Plus,
+  Trash2,
+  Edit3,
+  Check,
+  X,
+  Search,
+  FileText,
+  Download,
   Database,
   RefreshCw,
   AlertCircle,
@@ -118,7 +118,7 @@ export default function DatabasePage() {
       for (let i = startIndex; i < lines.length; i++) {
         const line = lines[i];
         const parts = splitCSVLine(line);
-        
+
         const rawCat = (parts[catCol] || '').toLowerCase().trim();
         const rawText = (parts[textCol] || parts.slice(textCol).join(',')).trim();
 
@@ -260,7 +260,7 @@ Random,Time Travel`;
 
   return (
     <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto max-w-6xl mx-auto w-full gap-6 animate-in fade-in duration-300">
-      
+
       {/* Top Banner / Stats Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-gray-200 shadow-sm">
         <div>
@@ -269,8 +269,7 @@ Random,Time Travel`;
               <Database className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Database & Mass Upload</h1>
-              <p className="text-xs sm:text-sm text-gray-500 font-medium">Manage, inspect, and bulk import cards for your game</p>
+              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Edit & Upload</h1>
             </div>
           </div>
         </div>
@@ -294,7 +293,7 @@ Random,Time Travel`;
 
       {/* 2-Column or Stacked Section: Mass Upload + CSV Info */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* CSV Upload Dropzone */}
         <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 p-5 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
@@ -318,11 +317,10 @@ Random,Time Travel`;
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
-                isDragging
-                  ? 'border-rose-500 bg-rose-50/50 scale-[0.99]'
-                  : 'border-gray-300 hover:border-gray-400 bg-gray-50/60'
-              }`}
+              className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${isDragging
+                ? 'border-rose-500 bg-rose-50/50 scale-[0.99]'
+                : 'border-gray-300 hover:border-gray-400 bg-gray-50/60'
+                }`}
             >
               <input
                 ref={fileInputRef}
@@ -351,11 +349,10 @@ Random,Time Travel`;
             )}
 
             {uploadStatus && (
-              <div className={`mt-3 p-3 rounded-xl text-xs flex items-start gap-2 ${
-                uploadStatus.type === 'success'
-                  ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                  : 'bg-rose-50 border border-rose-200 text-rose-800'
-              }`}>
+              <div className={`mt-3 p-3 rounded-xl text-xs flex items-start gap-2 ${uploadStatus.type === 'success'
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+                }`}>
                 {uploadStatus.type === 'success' ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                 ) : (
@@ -399,9 +396,10 @@ Random,Time Travel`;
         {/* CSV Format Quick Guide */}
         <div className="bg-white rounded-3xl border border-gray-200 p-5 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-2">CSV Format Guide</h3>
+            <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-2">Upload Guide</h3>
             <p className="text-xs text-gray-500 mb-3">
-              Create a spreadsheet with two columns:
+              Upload only accepts .csv file.
+              <br></br> Create a spreadsheet with two columns:
             </p>
             <div className="bg-gray-900 text-gray-100 rounded-xl p-3 text-[11px] font-mono leading-relaxed overflow-x-auto shadow-inner">
               <div className="text-gray-400">category,text</div>
@@ -423,10 +421,10 @@ Random,Time Travel`;
 
       {/* Database Table Section */}
       <section className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden flex flex-col">
-        
+
         {/* Table Controls Header */}
         <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-          
+
           {/* Search Input */}
           <div className="relative w-full md:w-72">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -453,11 +451,10 @@ Random,Time Travel`;
             <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm overflow-x-auto max-w-full">
               <button
                 onClick={() => setSelectedCategory('ALL')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                  selectedCategory === 'ALL'
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${selectedCategory === 'ALL'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:text-gray-900'
+                  }`}
               >
                 All ({rawCards.length})
               </button>
@@ -465,11 +462,10 @@ Random,Time Travel`;
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                    selectedCategory === cat
-                      ? 'bg-rose-50 text-[#E11D48] border border-rose-200'
-                      : 'text-gray-500 hover:text-gray-900'
-                  }`}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${selectedCategory === cat
+                    ? 'bg-rose-50 text-[#E11D48] border border-rose-200'
+                    : 'text-gray-500 hover:text-gray-900'
+                    }`}
                 >
                   {cat}
                 </button>
@@ -479,11 +475,10 @@ Random,Time Travel`;
             {/* Add New Row Button */}
             <button
               onClick={() => setIsAddingRow(prev => !prev)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer ${
-                isAddingRow
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200'
-              }`}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer ${isAddingRow
+                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200'
+                }`}
             >
               {isAddingRow ? (
                 <>
@@ -570,11 +565,10 @@ Random,Time Travel`;
                   const isEditing = editingId === card.id;
 
                   return (
-                    <tr 
+                    <tr
                       key={card.id}
-                      className={`hover:bg-gray-50/70 transition-colors ${
-                        isEditing ? 'bg-rose-50/30' : ''
-                      }`}
+                      className={`hover:bg-gray-50/70 transition-colors ${isEditing ? 'bg-rose-50/30' : ''
+                        }`}
                     >
                       {/* ID */}
                       <td className="py-3.5 px-4 sm:px-6 font-mono text-[11px] text-gray-400">
