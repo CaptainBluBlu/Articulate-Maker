@@ -6,4 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
-database.sqlite
+# SQLite database — mount db/ as a persistent volume in Coolify
+db/
+!db/.gitkeep
+migrate_nanoid.mjs

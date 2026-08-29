@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { useStore } from '../store';
 import { CATEGORIES, Category } from '../types';
 import ArticulateCard from '../components/ArticulateCard';
@@ -7,7 +8,8 @@ import { playAlarm } from '../lib/audio';
 type Mode = 'view' | 'play';
 
 export default function PlayPage() {
-  const { data } = useStore();
+  const { deckId } = useParams<{ deckId: string }>();
+  const { data } = useStore(deckId);
   const [mode, setMode] = useState<Mode>('view');
   
   const [currentCard, setCurrentCard] = useState<Partial<Record<Category, string>>>({});

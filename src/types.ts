@@ -18,6 +18,47 @@ export interface CardData {
   Random: string[];
 }
 
+export interface CardEntry {
+  id: number;
+  deck_id: string;
+  category: Category;
+  text: string;
+}
+
+export interface Deck {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface Visitor {
+  visitor_id: string;
+  ip_address: string;
+  user_agent: string;
+  browser_name: string;
+  browser_version: string;
+  os_name: string;
+  os_version: string;
+  device_type: string;
+  device_vendor: string;
+  device_model: string;
+  first_seen_at: string;
+  last_seen_at: string;
+}
+
+export interface DeckLog {
+  id: number;
+  deck_id: string;
+  deck_name?: string;
+  visitor_id: string;
+  action: string;
+  details: string | null;
+  created_at: string;
+  browser_name?: string;
+  os_name?: string;
+  ip_address?: string;
+}
+
 export const CATEGORY_COLORS: Record<Category, string> = {
   Person: 'bg-[#EAB308] text-black',
   World: 'bg-[#1E3A8A] text-white',

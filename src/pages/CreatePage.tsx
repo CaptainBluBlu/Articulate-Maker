@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { CATEGORIES, Category, CATEGORY_TEXT_COLORS } from '../types';
 import { useStore } from '../store';
 import { CheckCircle } from 'lucide-react';
 
 export default function CreatePage() {
-  const { addEntries, getStats } = useStore();
+  const { deckId } = useParams<{ deckId: string }>();
+  const { addEntries, getStats } = useStore(deckId);
   const stats = getStats();
   
   const [formData, setFormData] = useState<Partial<Record<Category, string>>>({});
