@@ -67,8 +67,8 @@ export default function LandingPage() {
       <div className="relative z-10 w-full max-w-md flex flex-col gap-8">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white border border-gray-200 rounded-3xl mb-4 shadow-sm">
-            <Layers className="w-8 h-8 text-[#E11D48]" />
+          <div className="inline-flex items-center justify-center w-24 h-24 mb-4 shadow-sm overflow-hidden rounded-[2rem]">
+            <img src="/pwa-512x512.png" alt="Articulate Maker Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
             Articulate

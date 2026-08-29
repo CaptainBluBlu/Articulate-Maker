@@ -50,6 +50,7 @@ export function useStore(deckId?: string) {
   const [rawCards, setRawCards] = useState<CardEntry[]>([]);
   const [currentDeck, setCurrentDeck] = useState<Deck | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   const fetchDeck = useCallback(async (id: string) => {
     try {
@@ -59,11 +60,15 @@ export function useStore(deckId?: string) {
       if (response.ok) {
         const deck: Deck = await response.json();
         setCurrentDeck(deck);
+        setNotFound(false);
       } else {
         setCurrentDeck(null);
+        setNotFound(true);
       }
     } catch (e) {
       console.error('Failed to fetch deck', e);
+      setCurrentDeck(null);
+      setNotFound(true);
     }
   }, []);
 
@@ -255,5 +260,6 @@ export function useStore(deckId?: string) {
     getStats,
     createDeck,
     loading,
+    notFound,
   };
 }
