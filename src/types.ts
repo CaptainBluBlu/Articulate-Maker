@@ -65,11 +65,11 @@ export interface DeckLog {
 
 export const CATEGORY_COLORS: Record<Category, string> = {
   Person: 'bg-[#E8BF41] text-black',
-  World: 'bg-[#1E3A8A] text-white',
+  World: 'bg-[#3b539c] text-white',
   Object: 'bg-[#38BDF8] text-black',
   Action: 'bg-[#F97316] text-white',
-  Nature: 'bg-[#14532D] text-white',
-  Random: 'bg-[#7F1D1D] text-white',
+  Nature: 'bg-[#1c914a] text-white',
+  Random: 'bg-[#f54040] text-white',
 };
 
 export const CATEGORY_TEXT_COLORS: Record<Category, string> = {
@@ -77,7 +77,7 @@ export const CATEGORY_TEXT_COLORS: Record<Category, string> = {
   World: 'text-[#1E3A8A]',
   Object: 'text-[#38BDF8]',
   Action: 'text-[#F97316]',
-  Nature: 'text-[#14532D]',
+  Nature: 'text-[#1c914a]',
   Random: 'text-[#7F1D1D]',
 };
 

@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 // db/ directory is mounted as a persistent volume in production (e.g. Coolify)
 const DB_DIR = path.resolve(__dirname, 'db');
 const DB_PATH = path.join(DB_DIR, 'database.sqlite');
@@ -495,13 +495,11 @@ app.get('/api/cards/raw', async (_req: Request, res: Response) => {
 // ─── Serve Frontend (Production) ─────────────────────────────────────────────
 
 const distPath = path.join(__dirname, 'dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  // The "catchall" handler: for any request that doesn't match an api route, send back React's index.html file.
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-}
+app.use(express.static(distPath));
+// The "catchall" handler: for any request that doesn't match an api route, send back React's index.html file.
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
