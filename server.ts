@@ -483,6 +483,17 @@ app.get('/api/cards/raw', async (_req: Request, res: Response) => {
   res.redirect(`/api/decks/${DEFAULT_DECK_ID}/cards/raw`);
 });
 
+// ─── Serve Frontend (Production) ─────────────────────────────────────────────
+
+const distPath = path.join(__dirname, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  // The "catchall" handler: for any request that doesn't match an api route, send back React's index.html file.
+  app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
 initDB().then(() => {
