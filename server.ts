@@ -24,12 +24,21 @@ let db: Database;
 
 async function initDB() {
   // Ensure the db directory exists (important for fresh deployments)
-  fs.mkdirSync(DB_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(DB_DIR, { recursive: true });
+  } catch (error: any) {
+    console.error('Failed to create DB directory (might be a permission issue with volume mount):', error.message);
+  }
 
-  db = await open({
-    filename: DB_PATH,
-    driver: sqlite3.Database,
-  });
+  try {
+    db = await open({
+      filename: DB_PATH,
+      driver: sqlite3.Database,
+    });
+  } catch (error: any) {
+    console.error('Failed to open database (check volume permissions):', error.message);
+    throw error;
+  }
 
   // Enable WAL mode for better concurrency
   await db.exec('PRAGMA journal_mode=WAL;');
@@ -206,9 +215,9 @@ app.post('/api/decks', async (req: Request, res: Response) => {
     await logAction(id, visitorId, 'CREATE_DECK', { name: name.trim() });
 
     res.json({ id, name: name.trim() });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating deck:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -219,9 +228,9 @@ app.get('/api/decks/:deckId', async (req: Request, res: Response) => {
     const deck = await db.get('SELECT id, name, created_at FROM decks WHERE id = ?', deckId);
     if (!deck) return res.status(404).json({ error: 'Deck not found' });
     res.json(deck);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching deck:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -240,9 +249,9 @@ app.get('/api/decks/:deckId/logs', async (req: Request, res: Response) => {
       deckId
     );
     res.json(logs);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching deck logs:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -252,9 +261,9 @@ app.get('/api/analytics/has-password', async (_req: Request, res: Response) => {
   try {
     const setting = await db.get('SELECT value FROM settings WHERE key = ?', 'analytics_password');
     res.json({ hasPassword: !!setting && setting.value.trim().length > 0 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error checking analytics password:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -269,9 +278,9 @@ app.post('/api/analytics/verify', async (req: Request, res: Response) => {
       return res.json({ success: true, verified: true });
     }
     return res.status(401).json({ success: false, verified: false, error: 'Invalid password' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error verifying analytics password:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -283,9 +292,9 @@ app.post('/api/analytics/password', async (req: Request, res: Response) => {
       'analytics_password', password || ''
     );
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error setting analytics password:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -295,9 +304,9 @@ app.get('/api/analytics/visitors', async (_req: Request, res: Response) => {
       'SELECT * FROM visitors ORDER BY last_seen_at DESC'
     );
     res.json(visitors);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching visitors:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -312,9 +321,9 @@ app.get('/api/analytics/logs', async (_req: Request, res: Response) => {
        LIMIT 500`
     );
     res.json(logs);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching logs:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -333,9 +342,9 @@ app.get('/api/decks/:deckId/cards', async (req: Request, res: Response) => {
       if (data[row.category]) data[row.category].push(row.text);
     }
     res.json(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching cards:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -348,9 +357,9 @@ app.get('/api/decks/:deckId/cards/raw', async (req: Request, res: Response) => {
       deckId
     );
     res.json(rows);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching raw cards:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -373,9 +382,9 @@ app.post('/api/decks/:deckId/cards', async (req: Request, res: Response) => {
     await stmt.finalize();
     await logAction(deckId, visitorId, 'ADD_CARDS', { categories: added });
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving cards:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -395,9 +404,9 @@ app.post('/api/decks/:deckId/cards/single', async (req: Request, res: Response) 
     );
     await logAction(deckId, visitorId, 'ADD_CARD', { category, text: text.trim() });
     res.json({ id: result.lastID, deck_id: deckId, category, text: text.trim() });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating single card:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -427,10 +436,10 @@ app.post('/api/decks/:deckId/cards/bulk', async (req: Request, res: Response) =>
 
     await logAction(deckId, visitorId, 'BULK_UPLOAD', { count: insertedCount });
     res.json({ success: true, count: insertedCount });
-  } catch (error) {
+  } catch (error: any) {
     await db.run('ROLLBACK').catch(() => {});
     console.error('Error bulk uploading cards:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -450,9 +459,9 @@ app.put('/api/decks/:deckId/cards/:id', async (req: Request, res: Response) => {
     );
     await logAction(deckId, visitorId, 'EDIT_CARD', { id: Number(id), category, text: text.trim() });
     res.json({ success: true, card: { id: Number(id), category, text: text.trim() } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating card:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 
@@ -467,9 +476,9 @@ app.delete('/api/decks/:deckId/cards/:id', async (req: Request, res: Response) =
     await db.run('DELETE FROM cards WHERE id = ? AND deck_id = ?', id, deckId);
     await logAction(deckId, visitorId, 'DELETE_CARD', card || { id });
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting card:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 

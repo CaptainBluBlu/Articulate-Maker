@@ -233,7 +233,7 @@ export function useStore(deckId?: string) {
   };
 
   // Create a new deck and return its ID
-  const createDeck = async (name: string): Promise<string | null> => {
+  const createDeck = async (name: string): Promise<{ id?: string, error?: string }> => {
     try {
       const res = await fetch('/api/decks', {
         method: 'POST',
@@ -242,12 +242,15 @@ export function useStore(deckId?: string) {
       });
       if (res.ok) {
         const deck: Deck = await res.json();
-        return deck.id;
+        return { id: deck.id };
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        return { error: errData.error || `Server error: ${res.status}` };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create deck', error);
+      return { error: error.message || 'Network error occurred' };
     }
-    return null;
   };
 
   return {

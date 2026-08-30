@@ -19,14 +19,14 @@ export default function LandingPage() {
     setIsCreating(true);
     setError(null);
     try {
-      const id = await createDeck(deckName.trim());
-      if (id) {
-        navigate(`/${id}`);
+      const result = await createDeck(deckName.trim());
+      if (result && result.id) {
+        navigate(`/${result.id}`);
       } else {
-        setError('Failed to create deck. Please try again.');
+        setError(result?.error || 'Failed to create deck. Please try again.');
       }
-    } catch {
-      setError('Failed to create deck. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to create deck. Please try again.');
     } finally {
       setIsCreating(false);
     }
