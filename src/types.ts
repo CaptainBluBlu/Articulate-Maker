@@ -64,7 +64,7 @@ export interface DeckLog {
 }
 
 export const CATEGORY_COLORS: Record<Category, string> = {
-  Person: 'bg-[#EAB308] text-black',
+  Person: 'bg-[#E8BF41] text-black',
   World: 'bg-[#1E3A8A] text-white',
   Object: 'bg-[#38BDF8] text-black',
   Action: 'bg-[#F97316] text-white',
